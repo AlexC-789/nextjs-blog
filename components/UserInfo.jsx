@@ -12,21 +12,26 @@ export default function UserInfo() {
   if (!session) {
     redirect('/');
   }
+
+  const { name, surname, email, hasHobby, chosenHobby } = session?.user;
+  const reference = {
+    "Nume": name, 
+    "Prenume": surname, 
+    "Email": email, 
+    "Are hobby": hasHobby ? "Da" : "Nu", 
+    "Hobby-ul ales": (chosenHobby !== "none") ? chosenHobby : "Neales"
+  };
+
   return (
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-8 bg-zince-300/10 flex flex-col gap-2 my-6">
-        <div>
-          Nume: <span className="font-bold">{session?.user?.name}</span>
-        </div>
-        <div>
-          Prenume: <span className="font-bold">{session?.user?.surname}</span>
-        </div>
-        <div>
-          Email: <span className="font-bold">{session?.user?.email}</span>
-        </div>
-        <div>
-          Are hobby: <span className="font-bold">{(session?.user?.hasHobby) ? "Da": "Nu"}</span>
-        </div>
+        {Object.keys(reference).map((key) => {
+          return (
+            <div key={`credential_${key}`}>
+              {key}: <span className="font-bold">{reference[key]}</span>
+            </div>
+          )
+        })}
         <button
           onClick={() => {signOut({callbackUrl: '/'})}}
           className="bg-red-500 text-white font-bold px-6 py-2 mt-3"
@@ -34,6 +39,7 @@ export default function UserInfo() {
           Deconectați-vă
         </button>
       </div>
+      
     </div>
   );
 }
