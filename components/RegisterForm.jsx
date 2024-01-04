@@ -11,11 +11,19 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [hasHobby, setHasHobby] = useState(false);
   const [error, setError] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
 
   const chosenHobby = "none";
   const router = useRouter();
 
   const handleSubmit = async (e) => {
+    if (isBusy) {
+      setError("Înregistrarea este în proces.")
+      return;
+    }
+
+    setIsBusy(true);
+    
     e.preventDefault();
 
     if (!name || !surname || !email || !password) {
@@ -63,6 +71,8 @@ export default function RegisterForm() {
       }
     } catch (error) {
       console.log("Error during registration: ", error);
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -104,7 +114,7 @@ export default function RegisterForm() {
             />
             Persoana are hobby sau nu
           </label>
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+          <button disabled={isBusy} className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
             Înregistrați-vă
           </button>
 
