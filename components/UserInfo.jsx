@@ -9,17 +9,18 @@ export default function UserInfo() {
   if (status === 'loading') {
     return;
   }
+
   if (!session) {
     redirect('/');
   }
 
-  const { name, surname, email, hasHobby, chosenHobby } = session?.user;
+  const { name, surname, email, hasHobby, chosenHobbies } = session?.user;
   const reference = {
-    "Nume": name, 
-    "Prenume": surname, 
-    "Email": email, 
-    "Are hobby": hasHobby ? "Da" : "Nu", 
-    "Hobby-ul ales": (chosenHobby !== "none") ? chosenHobby : "Neales"
+    "Nume": name,
+    "Prenume": surname,
+    "Email": email,
+    "Are hobby-uri": hasHobby ? "Da" : "Nu",
+    //"Hobby-urile alese": (chosenHobbies) ? chosenHobbies.join(", ") : "Nealese"
   };
 
   return (
@@ -32,6 +33,9 @@ export default function UserInfo() {
             </div>
           )
         })}
+        <div style={{whiteSpace: "pre-line"}}>
+          Hobby-uri alese: <br /><span className="font-bold">{chosenHobbies ? String.raw`${chosenHobbies.join('\n')}` : "Nealese"}</span>
+        </div>
         <button
           onClick={() => {signOut({callbackUrl: '/'})}}
           className="bg-red-500 text-white font-bold px-6 py-2 mt-3"
@@ -39,7 +43,6 @@ export default function UserInfo() {
           Deconectați-vă
         </button>
       </div>
-      
     </div>
   );
 }

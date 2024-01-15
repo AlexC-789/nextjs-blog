@@ -13,7 +13,6 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
   const [isBusy, setIsBusy] = useState(false);
 
-  const chosenHobby = "none";
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -58,7 +57,6 @@ export default function RegisterForm() {
           email,
           password,
           hasHobby,
-          chosenHobby
         }),
       });
 

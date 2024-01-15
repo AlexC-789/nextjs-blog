@@ -2,20 +2,21 @@
 
 import LoginOrSettings from "@/components/LoginOrSettings"
 import { useSession } from "next-auth/react"
-import { Dropdown, Questions } from "@/components/ForDashboard"
+import { Questions, ServerList } from "@/components/ForDashboard"
 
 export default function Dashboard() {
   const {data: session, status} = useSession();
   if (status === "loading") {
     return;
   }
+  
   const isInSearchOfHobby = !(session?.user?.hasHobby);
-  const chosenHobby = session?.user?.chosenHobby;
+  const chosenHobbies = session?.user?.chosenHobbies;
 
-  return(
+  return (
     <>
       <LoginOrSettings />
-      {(session?.user && !chosenHobby) ? ((isInSearchOfHobby) ? <Questions /> : <Dropdown />) : null}
+      {(session?.user && chosenHobbies) ? ((isInSearchOfHobby) ? <Questions /> : <ServerList />) : null}
     </>
   )
 }

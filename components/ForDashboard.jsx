@@ -157,27 +157,7 @@ function Questions() {
                                     <input className="mr-2"
                                     type="checkbox"
                                     checked={finalDecisions.includes(key)}
-                                    id={`hobbySelection_${key}`} name="hobbySelection" onChange={() => {handleCheckboxes(key)}
-                                    /*(e) => {
-                                        if (isBusy) {
-                                            return;
-                                        }
-                                        setIsBusy(true);
-                                        
-                                        if (e.target.checked) {
-                                            if (finalDecisions.length >= 5) {
-                                                setError("Trebuie să alegeți numai 5 hobby-uri.")
-                                                e.target.checked = false;
-                                            } else {
-                                                finalDecisions.push(key);
-                                                setError("");
-                                            }
-                                        } else {
-                                            finalDecisions = finalDecisions.filter((el) => el !== key);
-                                        }
-                                        //console.log(finalDecisions);
-                                        setIsBusy(false); */
-                                        }></input>
+                                    id={`hobbySelection_${key}`} name="hobbySelection" onChange={() => {handleCheckboxes(key)}}></input>
                                     {key}
                                 </label>
                             </div>
@@ -196,4 +176,24 @@ function Questions() {
     )
 }
 
-export {Dropdown, Questions}
+function ServerList() {
+    const {data: session} = useSession();
+    const servers = session?.user?.chosenHobbies;
+
+    return (
+        <div className="bg-gray-800 w-32 h-screen p-1">
+        <h2 className="text-white text-xl font-semibold mb-4">Hobby-uri</h2>
+        <ul>
+            {servers.map((server) => (
+            <li key={server} className="mb-2">
+                <a href="#" className="text-white hover:text-gray-400">
+                {server}
+                </a>
+            </li>
+            ))}
+        </ul>
+        </div>
+    );
+};
+
+export {Dropdown, Questions, ServerList}

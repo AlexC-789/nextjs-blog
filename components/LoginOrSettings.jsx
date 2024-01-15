@@ -11,7 +11,7 @@ export default function LoginOrSettings() {
     }
     
     return (
-      <Link className="text-sm inline-block p-4" href={session ? "/settings" : "/"}>
+      <Link className="text-sm inline-block p-1" href={session ? "/settings" : "/"}>
         <span className="underline">{session ? `${session.user.name} ${session.user.surname}` : "Conectați-vă"}</span>
       </Link>
     )
