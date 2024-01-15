@@ -20,7 +20,6 @@ export default function UserInfo() {
     "Prenume": surname,
     "Email": email,
     "Are hobby-uri": hasHobby ? "Da" : "Nu",
-    //"Hobby-urile alese": (chosenHobbies) ? chosenHobbies.join(", ") : "Nealese"
   };
 
   return (
@@ -33,8 +32,9 @@ export default function UserInfo() {
             </div>
           )
         })}
-        <div style={{whiteSpace: "pre-line"}}>
-          Hobby-uri alese: <br /><span className="font-bold">{chosenHobbies ? String.raw`${chosenHobbies.join('\n')}` : "Nealese"}</span>
+        <div style={{whiteSpace: chosenHobbies ? "pre-line" : "normal"}}>
+          Hobby-uri alese: <br />
+          <span className="font-bold">{chosenHobbies && chosenHobbies.length > 0 ? chosenHobbies.join('\n') : "Nealese"}</span>
         </div>
         <button
           onClick={() => {signOut({callbackUrl: '/'})}}

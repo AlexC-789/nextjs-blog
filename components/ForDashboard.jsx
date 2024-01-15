@@ -35,15 +35,18 @@ function Questions() {
     const [imgPath, setImgPath] = useState("");
     const {data: session} = useSession();
 
+    const minHobbyNum = 3;
+    const maxHobbyNum = 5;
+
     const handleCheckboxes = (value) => {
         if (finalDecisions.includes(value)) {
             setFinalDecisions(finalDecisions.filter((box) => box !== value));
             setError("");
-        } else if (finalDecisions.length < 5) {
+        } else if (finalDecisions.length < maxHobbyNum) {
             setFinalDecisions([...finalDecisions, value]);
             setError();
         } else {
-            setError("Trebuie să alegeți numai 5 hobby-uri.");
+            setError(`Trebuie să alegeți între ${minHobbyNum} și ${maxHobbyNum} hobby-uri.`);
         }
     }
 
@@ -55,9 +58,11 @@ function Questions() {
 
         setIsBusy(true);
         e.preventDefault();
+        const arrLength = finalDecisions.length
 
-        if (finalDecisions.length !== 5) {
-            setError("Trebuie să alegeți numai 5 hobby-uri.");
+        if (arrLength < minHobbyNum || arrLength > maxHobbyNum) {
+            setError(`Trebuie să alegeți între ${minHobbyNum} și ${maxHobbyNum} hobby-uri.`);
+            setIsBusy(false);
             return;
         }
 
@@ -94,7 +99,7 @@ function Questions() {
     }
     return (
         <form className="m-2" onSubmit={handleSubmit}>
-            <p>Deoarece nu v-ați selectat un hobby, completați acest formular pentru a înțelege ce vă place.</p>
+            <p>Deoarece nu ați selectat hobby-urile încă, completați acest formular pentru a înțelege ce vă place.</p>
             <p>{questionsForm["question"]}</p>
             {["Da", "Nu"].map((affirmation) => {
                 return (
