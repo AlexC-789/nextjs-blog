@@ -15,7 +15,7 @@ export default function Dashboard() {
   return(
     <>
       <LoginOrSettings />
-      {(session?.user && chosenHobby == "none") ? ((isInSearchOfHobby) ? <Questions /> : <Dropdown />) : null}
+      {(session?.user && !chosenHobby) ? ((isInSearchOfHobby) ? <Questions /> : <Dropdown />) : null}
     </>
   )
 }

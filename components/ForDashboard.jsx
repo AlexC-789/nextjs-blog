@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { questionsForm } from "@/lib/questions";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 function Dropdown() {
     const hobbies = ['Artă', 'Muzică', 'Știință', 'Filozofie', 'Sport'];
@@ -28,18 +28,40 @@ function Questions() {
 
     const [affirmationDict, setAffirmationDict] = useState({});
     const [hobbyDict, setHobbyDict] = useState({});
-    const [finalDecision, setFinalDecision] = useState("");
+    const [finalDecisions, setFinalDecisions] = useState([]);
     const [error, setError] = useState("");
+    const [isBusy, setIsBusy] = useState(false);
+    const [domain, setDomain] = useState("");
+    const [imgPath, setImgPath] = useState("");
     const {data: session} = useSession();
-    const router = useRouter();
+
+    const handleCheckboxes = (value) => {
+        if (finalDecisions.includes(value)) {
+            setFinalDecisions(finalDecisions.filter((box) => box !== value));
+            setError("");
+        } else if (finalDecisions.length < 5) {
+            setFinalDecisions([...finalDecisions, value]);
+            setError();
+        } else {
+            setError("Trebuie să alegeți numai 5 hobby-uri.");
+        }
+    }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!finalDecision) {
-            setError("Nu a fost ales un răspuns la ultima întrebare.");
+        if (isBusy) {
+            setError("Trimiterea formularului este în proces.");
             return;
         }
+
+        setIsBusy(true);
+        e.preventDefault();
+
+        if (finalDecisions.length !== 5) {
+            setError("Trebuie să alegeți numai 5 hobby-uri.");
+            return;
+        }
+
+        finalDecisions.sort();
 
         try {
             const res = await fetch("api/changeHobbyStatus", {
@@ -51,7 +73,7 @@ function Questions() {
                   name: session?.user?.name,
                   surname: session?.user?.surname,
                   email: session?.user?.email,
-                  chosenHobby: finalDecision
+                  chosenHobbies: finalDecisions
                 }),
               });
 
@@ -66,10 +88,13 @@ function Questions() {
             }
         } catch(error) {
             console.log(error)
+        } finally {
+            setIsBusy(false);
         }
     }
     return (
         <form className="m-2" onSubmit={handleSubmit}>
+            <p>Deoarece nu v-ați selectat un hobby, completați acest formular pentru a înțelege ce vă place.</p>
             <p>{questionsForm["question"]}</p>
             {["Da", "Nu"].map((affirmation) => {
                 return (
@@ -78,7 +103,11 @@ function Questions() {
                             if (e.target.checked) {
                                 setAffirmationDict(questionsForm["answers"][affirmation]);
                                 setHobbyDict({});
-                                setFinalDecision("");
+                                setDomain("");
+                                setImgPath(`/images/hobby_images/${affirmation}`)
+                                if (!isBusy) {
+                                    setFinalDecisions([]);
+                                }
                                 setError("");
                             }
                         }}></input>
@@ -98,7 +127,10 @@ function Questions() {
                             id={`domainSelection_${key}`} name="domainSelection" onChange={(e) => {
                                 if (e.target.checked) {
                                     setHobbyDict(affirmationDict["answers"][key]);
-                                    setFinalDecision("");
+                                    if (!isBusy) {
+                                        setFinalDecisions([]);
+                                    }
+                                    setDomain(key);
                                     setError("");
                                 }
                             }}></input>
@@ -108,38 +140,58 @@ function Questions() {
                     }
                 )}
 
+                {error && (
+                    <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
+                    {error}
+                    </div>
+                )}
+
                 {Object.keys(hobbyDict).length !== 0 &&
                 <>
                 <p>{hobbyDict["question"]}</p>
                     {hobbyDict["finalAnswers"].map((key) => {
                         return (
-                            <label className="m-4" key={key} htmlFor={`hobbySelection_${key}`}>
-                                <input className="mr-2"
-                                type="radio" 
-                                id={`hobbySelection_${key}`} name="hobbySelection" onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setFinalDecision(key);
-                                        setError("");
-                                    }
-                                }}></input>
-                                {key} 
-                            </label>
+                            <div className="m-4 relative inline-block" key={`hobbySelection_${key}`}>
+                                <Image src={`${imgPath}/${encodeURIComponent(domain)}/${encodeURIComponent(key)}.png`} width={150} height={150} alt={key}/>
+                                <label key={key} htmlFor={`hobbySelection_${key}`}>
+                                    <input className="mr-2"
+                                    type="checkbox"
+                                    checked={finalDecisions.includes(key)}
+                                    id={`hobbySelection_${key}`} name="hobbySelection" onChange={() => {handleCheckboxes(key)}
+                                    /*(e) => {
+                                        if (isBusy) {
+                                            return;
+                                        }
+                                        setIsBusy(true);
+                                        
+                                        if (e.target.checked) {
+                                            if (finalDecisions.length >= 5) {
+                                                setError("Trebuie să alegeți numai 5 hobby-uri.")
+                                                e.target.checked = false;
+                                            } else {
+                                                finalDecisions.push(key);
+                                                setError("");
+                                            }
+                                        } else {
+                                            finalDecisions = finalDecisions.filter((el) => el !== key);
+                                        }
+                                        //console.log(finalDecisions);
+                                        setIsBusy(false); */
+                                        }></input>
+                                    {key}
+                                </label>
+                            </div>
                         )
                         }
                     )}
                 <br /> 
-                <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+                <button disabled={isBusy} className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
                     Trimite formularul
                 </button>
+                <p>După apăsarea butonului de sus și confirmarea schimbărilor în baza de date, veți fi nevoit(ă) să reintrați în contul vostru.</p>
                 </>}
                 </>
             }
-
-        {error && (
-            <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
-              {error}
-            </div>
-          )}
         </form>
     )
 }

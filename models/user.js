@@ -22,9 +22,9 @@ const userSchema = new Schema(
       type: Boolean,
       required: true,
     },
-    chosenHobby: {
-      type: String,
-      required: true,
+    chosenHobbies: {
+      type: [String],
+      required: true
     }
   },
   { timestamps: true }
