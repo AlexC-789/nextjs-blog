@@ -60,13 +60,22 @@ export default function RegisterForm() {
         }),
       });
 
+      const result = await res.json();
+
       if (res.ok) {
         const form = e.target;
         form.reset();
         router.push("/");
+      } else if (result.message == "Email address cannot be validated.") {
+        setError("Adresa de email nu poate fi validată.");
+        return;
+      } else if (result.message == "Password length is too small.") {
+        setError("Lungimea parolei trebuie să fie de minim 8 caractere.")
+        return;
       } else {
         console.log("User registration failed.");
       }
+
     } catch (error) {
       console.log("Error during registration: ", error);
     } finally {
@@ -95,6 +104,7 @@ export default function RegisterForm() {
           <input
             onChange={(e) => setEmail(e.target.value)}
             type="text"
+
             placeholder="Email"
             css_id="inputAuth"
           />

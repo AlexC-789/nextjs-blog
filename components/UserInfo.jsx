@@ -2,10 +2,14 @@
 
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 import { redirect } from "next/navigation";
 
 export default function UserInfo() {
   const { data: session, status } = useSession();
+
+  const [emailIsShown, setEmailIsShown] = useState(false);
+
   if (status === 'loading') {
     return;
   }
@@ -15,10 +19,13 @@ export default function UserInfo() {
   }
 
   const { name, surname, email, hasHobby, chosenHobbies } = session?.user;
+  
+  const hidingChar = '*';
+  const hiddenEmail = hidingChar.repeat(7);
+
   const reference = {
     "Nume": name,
     "Prenume": surname,
-    "Email": email,
     "Are hobby-uri": hasHobby ? "Da" : "Nu",
   };
 
@@ -35,6 +42,14 @@ export default function UserInfo() {
         <div style={{whiteSpace: chosenHobbies ? "pre-line" : "normal"}}>
           Hobby-uri alese: <br />
           <span className="font-bold">{chosenHobbies && chosenHobbies.length > 0 ? chosenHobbies.join('\n') : "Nealese"}</span>
+        </div>
+        <div>
+          Email: <span className="font-bold">{emailIsShown ? email : hiddenEmail}</span>
+          <br />
+          <label>
+            <input className="mr-2" type="checkbox" onClick={(e) => {setEmailIsShown(e.target.checked)}}/>
+            Afișează email-ul
+          </label>
         </div>
         <button
           onClick={() => {signOut({callbackUrl: '/'})}}
